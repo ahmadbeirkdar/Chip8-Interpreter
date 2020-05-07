@@ -4,6 +4,7 @@
 
 #include "Chip8.h"
 #include <cstdlib>
+#include <fstream>
 
 Chip8::Chip8()
     : pc(START_ADDR){
@@ -303,6 +304,19 @@ void Chip8::OP_FX55() {
 void Chip8::OP_FX65() {
     for(unsigned int i = 0; i <=  ((opcode & 0x0F00u) >> 8u); i++)
         registers[i] = memory[index+i];
+}
+
+void Chip8::LoadGame(char *filename) {
+    FILE *fp = fopen(filename, "rb");
+    fseek(fp, 0L, SEEK_END);
+    char* buffer = new char[ftell(fp)];
+    rewind(fp);
+    fread(buffer, sizeof(buffer), 1, fp);
+    for(unsigned long long i = 0; i < sizeof(buffer); i++)
+        memory[START_ADDR + i] = buffer[i];
+
+    fclose(fp);
+    free(buffer);
 }
 
 

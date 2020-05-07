@@ -11,6 +11,7 @@
 class Chip8 {
 public:
     Chip8();
+    void LoadGame(char* filename);
 
 private:
     const unsigned int START_ADDR = 0x200;
