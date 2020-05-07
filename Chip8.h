@@ -15,6 +15,8 @@ public:
 private:
     const unsigned int START_ADDR = 0x200;
     const unsigned int FONT_ADRR = 0x50;
+    const unsigned int VIDEO_HEIGHT = 32;
+    const unsigned int VIDEO_WIDTH = 64;
     uint8_t registers[16]{};
     uint8_t memory[4096]{};
     uint16_t index{};
@@ -27,6 +29,7 @@ private:
     uint32_t display[64*32]{};
     uint16_t opcode{};
 
+    // Instructions starts with unique number or char
     void OP_00E0();
     void OP_00EE();
     void OP_1NNN();
@@ -36,6 +39,15 @@ private:
     void OP_5XY0();
     void OP_6XKK();
     void OP_7XKK();
+    void OP_9XY0();
+    void OP_ANNN();
+    void OP_BNNN();
+    void OP_CXKK();
+    void OP_DXYN();
+    void OP_EX9E();
+    void OP_EXA1();
+
+    // Instruction starts with 8
     void OP_8XY0();
     void OP_8XY1();
     void OP_8XY2();
@@ -45,6 +57,11 @@ private:
     void OP_8XY6();
     void OP_8XY7();
     void OP_8XYE();
+
+    // Instructions starts with F
+    void OP_FX07();
+    void OP_FX0A();
+
 };
 
 unsigned char chip8_fontset[80] = {
