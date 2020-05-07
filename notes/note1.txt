@@ -1,0 +1,61 @@
+The CHIP8 CPU has 34 instructions
+
+
+CHIP8:
+
+    16 8-bit Registers:
+        Dedicated location on CPU for storage
+        Operations done by the CPU must be done within the Registers
+        Labeled V0 to VF
+        Holds 0x00 to 0xFF
+        Register VF is used as a flag to hold information about the result of operations
+
+    4096 Bytes of Memory:
+        Address space from 0x000 to 0xFFF
+        0x000-0x1FF - Originally reserved for the CHIP8 interpreter itself. 
+        0x050-0x0A0 - Storage space for the 16 characters 0 to F
+        0x200-0xFFF - instructions of the ROM will be stored here starting from 0x200, anything left is free to use
+
+    16-bit Index Register:
+        Special register used to store memory addresses for operations
+        16 bits as the maximum memory address is 0xFFF
+
+    16-bit Program Counter
+        Special register which holds the address of the next instruction to execute
+        16 bits as the maximum memory address is 0xFFF
+        NEEDS MORE INFO 
+
+    16 Level Stack:
+        Keeps track of the order of executions when it calls into functions for the CPU 
+        An instruction CALL will cause the PCU to execute instructions in a different region of the program
+        when the program reaches the instruction RET it must go back to where it was when it hit CALL
+        The stack holds the PC value when the CALL instruction was executed.
+        So the RETURN statement pulls the address of the CALL from the stack so it will execute the next cycle
+        The CHIP8 has 16 levels of the stack so 16 different PCs 
+        Putting a PC onto the stack is called pushing
+        Pulling a PC from the stack is called popping
+
+    8-bit Stack Pointer
+        Tells us where in the 16 level stack the most recent value was placed.
+        8-bits is used as the stack will be represented as an array so the stack pointer is just the index to the array
+        When a value is popped off the stack it wont be deleted just the stack pointer will be decremented
+
+    8-bit Delay Timer:
+        Time for timing
+        If the timer value is zero, stays zero
+        If it is set with any value it will decrement at a rate of whatever the cycle clock is set to
+
+    8-bit Sound Timer:
+        Timer for Sound
+        If set to zero, stays zero
+        If set to a value decrements at a rate of 60Hz
+
+    Input 16 Keys:
+        Input keys threw 0 to F 
+    
+    64x32 Display Memory:
+        Memory buffer used to store graphics for the Display
+        unint32 per each pixel
+        ON 0xFFFFFFFF
+        OFF 0x00000000
+        
