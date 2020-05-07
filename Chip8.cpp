@@ -191,8 +191,121 @@ void Chip8::OP_FX07() {
 
 // Wait for a key press, store the value of the key in Vx.
 void Chip8::OP_FX0A() {
-    // TODO
+
+    if (keys[0])
+    {
+        registers[(opcode & 0x0F00u) >> 8u] = 0;
+    }
+    else if (keys[1])
+    {
+        registers[(opcode & 0x0F00u) >> 8u] = 1;
+    }
+    else if (keys[2])
+    {
+        registers[(opcode & 0x0F00u) >> 8u] = 2;
+    }
+    else if (keys[3])
+    {
+        registers[(opcode & 0x0F00u) >> 8u] = 3;
+    }
+    else if (keys[4])
+    {
+        registers[(opcode & 0x0F00u) >> 8u] = 4;
+    }
+    else if (keys[5])
+    {
+        registers[(opcode & 0x0F00u) >> 8u] = 5;
+    }
+    else if (keys[6])
+    {
+        registers[(opcode & 0x0F00u) >> 8u] = 6;
+    }
+    else if (keys[7])
+    {
+        registers[(opcode & 0x0F00u) >> 8u] = 7;
+    }
+    else if (keys[8])
+    {
+        registers[(opcode & 0x0F00u) >> 8u] = 8;
+    }
+    else if (keys[9])
+    {
+        registers[(opcode & 0x0F00u) >> 8u] = 9;
+    }
+    else if (keys[10])
+    {
+        registers[(opcode & 0x0F00u) >> 8u] = 10;
+    }
+    else if (keys[11])
+    {
+        registers[(opcode & 0x0F00u) >> 8u] = 11;
+    }
+    else if (keys[12])
+    {
+        registers[(opcode & 0x0F00u) >> 8u] = 12;
+    }
+    else if (keys[13])
+    {
+        registers[(opcode & 0x0F00u) >> 8u] = 13;
+    }
+    else if (keys[14])
+    {
+        registers[(opcode & 0x0F00u) >> 8u] = 14;
+    }
+    else if (keys[15])
+    {
+        registers[(opcode & 0x0F00u) >> 8u] = 15;
+    }
+    else
+    {
+        pc -= 2;
+    }
 }
+
+// Set delay timer = Vx.
+void Chip8::OP_FX15() {
+    DelayTimer = registers[(opcode & 0x0F00u) >> 8u];
+}
+
+// Set sound timer = Vx.
+void Chip8::OP_FX18() {
+    SoundTimer = registers[(opcode & 0x0F00u) >> 8u];
+}
+
+// Set I = I + Vx.
+void Chip8::OP_FX1E() {
+    index += registers[(opcode & 0x0F00u) >> 8u];
+}
+
+// Set I = location of sprite for digit Vx.
+// The value of I is set to the location for the hexadecimal sprite corresponding to the value of Vx.
+// See section 2.4, Display, for more information on the Chip-8 hexadecimal font.
+void Chip8::OP_FX29() {
+    index = FONT_ADRR + (5*registers[(opcode & 0x0F00u) >> 8u]);
+}
+
+// Store BCD representation of Vx in memory locations I, I+1, and I+2.
+// The interpreter takes the decimal value of Vx, and places the hundreds digit in memory at location in I,
+// the tens digit at location I+1, and the ones digit at location I+2.
+void Chip8::OP_FX33() {
+    memory[index] = ((registers[(opcode & 0x0F00u) >> 8u]) / 100);
+    memory[index + 1] = ((registers[(opcode & 0x0F00u) >> 8u]) / 10) % 10;
+    memory[index + 2] = ((registers[(opcode & 0x0F00u) >> 8u]) % 10);
+}
+
+// Store registers V0 through Vx in memory starting at location I.
+void Chip8::OP_FX55() {
+    for(unsigned int i = 0; i <=  ((opcode & 0x0F00u) >> 8u); i++)
+        memory[index+i] = registers[i];
+}
+
+// Read registers V0 through Vx from memory starting at location I.
+void Chip8::OP_FX65() {
+    for(unsigned int i = 0; i <=  ((opcode & 0x0F00u) >> 8u); i++)
+        registers[i] = memory[index+i];
+}
+
+
 
 
 
