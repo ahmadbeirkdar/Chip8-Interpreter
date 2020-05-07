@@ -42,27 +42,85 @@ void Chip8::OP_3XKK() {
 // Skips the next instruction if VX doesn't equal NN
 void Chip8::OP_4XKK() {
     if(registers[(opcode & 0x0F00u) >> 8u] != (opcode & 0x00FFu))
-        pc+=2
+        pc+=2;
 }
 
 // Skips the next instruction if VX equals VY
 void Chip8::OP_5XY0() {
     if(registers[(opcode & 0x0F00u) >> 8u] == registers[(opcode & 0x00F0u) >> 4u])
-        pc+=2
+        pc+=2;
 }
 // Set Vx = kk.
 void Chip8::OP_6XKK() {
-    registers[(opcode & 0x0F00u) >> 8u] = (opcode & 0x00FFu)
+    registers[(opcode & 0x0F00u) >> 8u] = (opcode & 0x00FFu);
 }
 
 // Set Vx = Vx + kk.
 void Chip8::OP_7XKK() {
-    registers[(opcode & 0x0F00u) >> 8u] += (opcode & 0x00FFu)
+    registers[(opcode & 0x0F00u) >> 8u] += (opcode & 0x00FFu);
 }
 
 // Set Vx = Vy
 void Chip8::OP_8XY0() {
-    registers[(opcode & 0x0F00u) >> 8u] = registers[(opcode & 0x00F0u) >> 4u]
+    registers[(opcode & 0x0F00u) >> 8u] = registers[(opcode & 0x00F0u) >> 4u];
 }
+
+// Set Vx = Vx Or Vy
+void Chip8::OP_8XY1() {
+    registers[(opcode & 0x0F00u) >> 8u] |= registers[(opcode & 0x00F0u) >> 4u];
+}
+
+// Set Vx = Vx AND Vy
+void Chip8::OP_8XY2() {
+    registers[(opcode & 0x0F00u) >> 8u] &= registers[(opcode & 0x00F0u) >> 4u];
+}
+
+// Set Vx = Vx XOR Vy
+void Chip8::OP_8XY3() {
+    registers[(opcode & 0x0F00u) >> 8u] ^= registers[(opcode & 0x00F0u) >> 4u];
+}
+
+// Set Vx = Vx + Vy, set VF = carry. V at 0xF. If sum larger than 255, what a 8bit can hold max then it is carried.
+void Chip8::OP_8XY4() {
+    if(registers[(opcode & 0x00F0u) >> 4u] > (0xFF - registers[(opcode & 0x0F00u) >> 8u]))
+        registers[0xF] = 1;
+    else
+        registers[0xF] = 0;
+    registers[(opcode & 0x0F00u) >> 8u] += registers[(opcode & 0x00F0u) >> 4u];
+}
+
+// Set Vx = Vx - Vy, set VF = NOT borrow.
+void Chip8::OP_8XY5() {
+    if(registers[(opcode & 0x00F0u) >> 4u] > registers[(opcode & 0x0F00u) >> 8u])
+        registers[0xF] = 0;
+    else
+        registers[0xF] = 1;
+    registers[(opcode & 0x0F00u) >> 8u] -= registers[(opcode & 0x00F0u) >> 4u];
+}
+
+// Stores the least significant bit of VX in VF and then shifts VX to the right by 1.
+void Chip8::OP_8XY6() {
+    registers[0xF] = (registers[(opcode & 0x0F00u) >> 8u] & 0x1u);
+    registers[(opcode & 0x0F00u) >> 8u] >>= 1u;
+}
+
+// Set Vx = Vy - Vx, set VF = NOT borrow.
+void Chip8::OP_8XY7() {
+    if(registers[(opcode & 0x0F00u) >> 8u] > registers[(opcode & 0x00F0u) >> 4u])
+        registers[0xF] = 0;
+    else
+        registers[0xF] = 1;
+    registers[(opcode & 0x00F0u) >> 4u] -= registers[(opcode & 0x0F00u) >> 8u];
+}
+
+// Stores the most significant bit of VX in VF and then shifts VX to the left by 1
+void Chip8::OP_8XYE() {
+    registers[0xF] = (registers[(opcode & 0x0F00u) >> 8u] >> 7u);
+    registers[(opcode & 0x0F00u) >> 8u] <<= 1u;
+}
+
+
+
+
 
 

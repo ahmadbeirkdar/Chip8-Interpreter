@@ -37,7 +37,14 @@ private:
     void OP_6XKK();
     void OP_7XKK();
     void OP_8XY0();
-
+    void OP_8XY1();
+    void OP_8XY2();
+    void OP_8XY3();
+    void OP_8XY4();
+    void OP_8XY5();
+    void OP_8XY6();
+    void OP_8XY7();
+    void OP_8XYE();
 };
 
 unsigned char chip8_fontset[80] = {
