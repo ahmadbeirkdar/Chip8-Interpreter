@@ -7,11 +7,12 @@
 
 
 #include <cstdint>
+#include <string>
 
 class Chip8 {
 public:
     Chip8();
-    void LoadGame(char* filename);
+    void LoadGame(std::string filename);
     void emulate();
 
     uint8_t keys[16]{};

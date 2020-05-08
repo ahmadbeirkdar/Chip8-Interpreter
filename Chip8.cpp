@@ -406,7 +406,7 @@ void Chip8::OP_FX65() {
 }
 
 // Read ROM
-void Chip8::LoadGame(char *filename) {
+void Chip8::LoadGame(std::string filename) {
     std::ifstream file(filename, std::ios::ate | std::ios::binary);
     long sizeBuff = file.tellg();
     char* buffer = new char[sizeBuff];
