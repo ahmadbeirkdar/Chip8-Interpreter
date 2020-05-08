@@ -1,8 +1,21 @@
 # Chip8-Interpreter
-A Chip8 Interpreter written in modern C++. 
+ A Chip8 Interpreter written in modern C++. 
 
 
-Methods to interpret the OPCODES have been done, see Chip8.cpp. Now working on the emulator. 
+
+Showcase:
+
+[![](http://img.youtube.com/vi/DZa5QTGeFqM/0.jpg)](http://www.youtube.com/watch?v=DZa5QTGeFqM "")
+
+
+
+Currently I am using a premade "Platform Layer" to test out if the interpreter I wrote works, and it does wonderfully(check the video).
+
+Next step is to possibly learn more about how to render on the screen correctly using SDL or OpenGL and get input, and implement it by myself. 
+
+But the main part of the project, is the interpreter :)
+
+
 
 
 Resources:
