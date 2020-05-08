@@ -3,8 +3,28 @@
 //
 
 #include "Chip8.h"
-#include <cstdlib>
+
 #include <fstream>
+#include <iostream>
+
+unsigned char chip8_fontset[80] = {
+        0xF0, 0x90, 0x90, 0x90, 0xF0, //0
+        0x20, 0x60, 0x20, 0x20, 0x70, //1
+        0xF0, 0x10, 0xF0, 0x80, 0xF0, //2
+        0xF0, 0x10, 0xF0, 0x10, 0xF0, //3
+        0x90, 0x90, 0xF0, 0x10, 0x10, //4
+        0xF0, 0x80, 0xF0, 0x10, 0xF0, //5
+        0xF0, 0x80, 0xF0, 0x90, 0xF0, //6
+        0xF0, 0x10, 0x20, 0x40, 0x40, //7
+        0xF0, 0x90, 0xF0, 0x90, 0xF0, //8
+        0xF0, 0x90, 0xF0, 0x10, 0xF0, //9
+        0xF0, 0x90, 0xF0, 0x90, 0x90, //A
+        0xE0, 0x90, 0xE0, 0x90, 0xE0, //B
+        0xF0, 0x80, 0x80, 0x80, 0xF0, //C
+        0xE0, 0x90, 0x90, 0x90, 0xE0, //D
+        0xF0, 0x80, 0xF0, 0x80, 0xF0, //E
+        0xF0, 0x80, 0xF0, 0x80, 0x80  //F
+};
 
 Chip8::Chip8()
     : pc(START_ADDR){
@@ -62,69 +82,82 @@ Chip8::Chip8()
 void Chip8::OP_00E0() {
     for(int i = 0; i < 32*64; i++)
         display[i] = 0;
+
 }
 
 // Return
 void Chip8::OP_00EE() {
     pc = stack[--sp];
+
 }
 
 // goto NNN
 void Chip8::OP_1NNN() {
     pc = opcode & 0x0FFFu;
+
 }
 
 // Call subroutine at NNN
 void Chip8::OP_2NNN() {
     stack[sp++] = pc;
     pc = opcode & 0x0FFFu;
+
 }
 
 // Skips the next instruction if VX equals NN
 void Chip8::OP_3XKK() {
     if(registers[(opcode & 0x0F00u) >> 8u] == (opcode & 0x00FFu))
         pc+=2;
+
 }
 
 // Skips the next instruction if VX doesn't equal NN
 void Chip8::OP_4XKK() {
     if(registers[(opcode & 0x0F00u) >> 8u] != (opcode & 0x00FFu))
         pc+=2;
+
 }
 
 // Skips the next instruction if VX equals VY
 void Chip8::OP_5XY0() {
     if(registers[(opcode & 0x0F00u) >> 8u] == registers[(opcode & 0x00F0u) >> 4u])
         pc+=2;
+
 }
 // Set Vx = kk.
 void Chip8::OP_6XKK() {
     registers[(opcode & 0x0F00u) >> 8u] = (opcode & 0x00FFu);
+
 }
 
 // Set Vx = Vx + kk.
 void Chip8::OP_7XKK() {
     registers[(opcode & 0x0F00u) >> 8u] += (opcode & 0x00FFu);
+
 }
 
 // Set Vx = Vy
 void Chip8::OP_8XY0() {
     registers[(opcode & 0x0F00u) >> 8u] = registers[(opcode & 0x00F0u) >> 4u];
+
 }
 
 // Set Vx = Vx Or Vy
 void Chip8::OP_8XY1() {
     registers[(opcode & 0x0F00u) >> 8u] |= registers[(opcode & 0x00F0u) >> 4u];
+
 }
 
 // Set Vx = Vx AND Vy
 void Chip8::OP_8XY2() {
     registers[(opcode & 0x0F00u) >> 8u] &= registers[(opcode & 0x00F0u) >> 4u];
+
 }
 
 // Set Vx = Vx XOR Vy
 void Chip8::OP_8XY3() {
     registers[(opcode & 0x0F00u) >> 8u] ^= registers[(opcode & 0x00F0u) >> 4u];
+
 }
 
 // Set Vx = Vx + Vy, set VF = carry. V at 0xF. If sum larger than 255, what a 8bit can hold max then it is carried.
@@ -134,6 +167,7 @@ void Chip8::OP_8XY4() {
     else
         registers[0xF] = 0;
     registers[(opcode & 0x0F00u) >> 8u] += registers[(opcode & 0x00F0u) >> 4u];
+
 }
 
 // Set Vx = Vx - Vy, set VF = NOT borrow.
@@ -143,12 +177,14 @@ void Chip8::OP_8XY5() {
     else
         registers[0xF] = 1;
     registers[(opcode & 0x0F00u) >> 8u] -= registers[(opcode & 0x00F0u) >> 4u];
+
 }
 
 // Stores the least significant bit of VX in VF and then shifts VX to the right by 1.
 void Chip8::OP_8XY6() {
     registers[0xF] = (registers[(opcode & 0x0F00u) >> 8u] & 0x1u);
     registers[(opcode & 0x0F00u) >> 8u] >>= 1u;
+
 }
 
 // Set Vx = Vy - Vx, set VF = NOT borrow.
@@ -158,34 +194,40 @@ void Chip8::OP_8XY7() {
     else
         registers[0xF] = 1;
     registers[(opcode & 0x00F0u) >> 4u] -= registers[(opcode & 0x0F00u) >> 8u];
+
 }
 
 // Stores the most significant bit of VX in VF and then shifts VX to the left by 1
 void Chip8::OP_8XYE() {
     registers[0xF] = (registers[(opcode & 0x0F00u) >> 8u] >> 7u);
     registers[(opcode & 0x0F00u) >> 8u] <<= 1u;
+
 }
 
 // Skip next instruction if Vx != Vy.
 void Chip8::OP_9XY0() {
     if(registers[(opcode & 0x0F00u) >> 8u] != registers[(opcode & 0x00F0u) >> 4u])
         pc+= 2;
+
 }
 
 
 // Sets I to the address NNN. index
 void Chip8::OP_ANNN() {
     index = (opcode & 0x0FFFu);
+
 }
 
 // Jump to location nnn + V0.
 void Chip8::OP_BNNN() {
     pc = registers[0] + (opcode & 0x0FFFu);
+
 }
 
 // Set Vx = random byte AND kk.
 void Chip8::OP_CXKK() {
     registers[(opcode & 0x0F00u) >> 8u] = ((std::rand() % 0xFFu)&(opcode & 0x00FFu));
+
 }
 
 // Display n-byte sprite starting at memory location I at (Vx, Vy), set VF = collision.
@@ -216,23 +258,27 @@ void Chip8::OP_DXYN() {
 
 
 
+
 }
 
 // Skip next instruction if key with the value of Vx is pressed.
 void Chip8::OP_EX9E() {
     if(keys[registers[(opcode & 0x0F00u) >> 8u]])
         pc+=2;
+
 }
 
 // Skip next instruction if key with the value of Vx is not pressed.
 void Chip8::OP_EXA1() {
     if(!keys[registers[(opcode & 0x0F00u) >> 8u]])
         pc+=2;
+
 }
 
 // Set Vx = delay timer value.
 void Chip8::OP_FX07() {
     registers[(opcode & 0x0F00u) >> 8u] = DelayTimer;
+
 }
 
 // Wait for a key press, store the value of the key in Vx.
@@ -306,21 +352,25 @@ void Chip8::OP_FX0A() {
     {
         pc -= 2;
     }
+
 }
 
 // Set delay timer = Vx.
 void Chip8::OP_FX15() {
     DelayTimer = registers[(opcode & 0x0F00u) >> 8u];
+
 }
 
 // Set sound timer = Vx.
 void Chip8::OP_FX18() {
     SoundTimer = registers[(opcode & 0x0F00u) >> 8u];
+
 }
 
 // Set I = I + Vx.
 void Chip8::OP_FX1E() {
     index += registers[(opcode & 0x0F00u) >> 8u];
+
 }
 
 // Set I = location of sprite for digit Vx.
@@ -328,6 +378,7 @@ void Chip8::OP_FX1E() {
 // See section 2.4, Display, for more information on the Chip-8 hexadecimal font.
 void Chip8::OP_FX29() {
     index = FONT_ADRR + (5*registers[(opcode & 0x0F00u) >> 8u]);
+
 }
 
 // Store BCD representation of Vx in memory locations I, I+1, and I+2.
@@ -337,33 +388,38 @@ void Chip8::OP_FX33() {
     memory[index] = ((registers[(opcode & 0x0F00u) >> 8u]) / 100);
     memory[index + 1] = ((registers[(opcode & 0x0F00u) >> 8u]) / 10) % 10;
     memory[index + 2] = ((registers[(opcode & 0x0F00u) >> 8u]) % 10);
+
 }
 
 // Store registers V0 through Vx in memory starting at location I.
 void Chip8::OP_FX55() {
     for(unsigned int i = 0; i <=  ((opcode & 0x0F00u) >> 8u); i++)
         memory[index+i] = registers[i];
+
 }
 
 // Read registers V0 through Vx from memory starting at location I.
 void Chip8::OP_FX65() {
     for(unsigned int i = 0; i <=  ((opcode & 0x0F00u) >> 8u); i++)
         registers[i] = memory[index+i];
+
 }
 
 // Read ROM
 void Chip8::LoadGame(char *filename) {
-    FILE *fp = fopen(filename, "rb");
-    fseek(fp, 0L, SEEK_END);
-    char* buffer = new char[ftell(fp)];
-    rewind(fp);
-    fread(buffer, sizeof(buffer), 1, fp);
+    std::ifstream file(filename, std::ios::ate | std::ios::binary);
+    long sizeBuff = file.tellg();
+    char* buffer = new char[sizeBuff];
+    file.seekg(0, std::ios::beg);
+    file.read(buffer, sizeBuff);
 
-    for(unsigned long long i = 0; i < sizeof(buffer); i++)
+    for (unsigned long i = 0; i < sizeBuff; ++i)
         memory[START_ADDR + i] = buffer[i];
 
-    fclose(fp);
     free(buffer);
+    file.close();
+
+
 }
 
 // Tables
@@ -396,6 +452,8 @@ void Chip8::emulate() {
         DelayTimer--;
     if(SoundTimer > 0)
         SoundTimer--;
+    std::cout <<std::hex<< "OPCODE: 0x" << opcode << std::dec <<" Program Counter: " << pc << " Stack Counter: " << sp << " Index: " << index <<std::endl;
+
 
 }
 
