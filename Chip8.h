@@ -12,6 +12,7 @@ class Chip8 {
 public:
     Chip8();
     void LoadGame(char* filename);
+    void emulate();
 
 private:
     const unsigned int START_ADDR = 0x200;
@@ -30,9 +31,7 @@ private:
     uint32_t display[64*32]{};
     uint16_t opcode{};
 
-    // Instructions starts with unique number or char
-    void OP_00E0();
-    void OP_00EE();
+    // Instructions starts with unique number or char. put in the main array. Unique start so & 0xF000u
     void OP_1NNN();
     void OP_2NNN();
     void OP_3XKK();
@@ -48,7 +47,11 @@ private:
     void OP_EX9E();
     void OP_EXA1();
 
-    // Instruction starts with 8
+    // Instruction starts with 00E, Unique ending so & 0x000Fu. Put in one array
+    void OP_00E0();
+    void OP_00EE();
+
+    // Instruction starts with 8XY, Unique ending so & 0x000Fu. Put in one array
     void OP_8XY0();
     void OP_8XY1();
     void OP_8XY2();
@@ -59,7 +62,7 @@ private:
     void OP_8XY7();
     void OP_8XYE();
 
-    // Instructions starts with F
+    // Instructions starts with FX, Unique ending so & 0x00FFu. Put in one array
     void OP_FX07();
     void OP_FX0A();
     void OP_FX15();
@@ -69,6 +72,22 @@ private:
     void OP_FX33();
     void OP_FX55();
     void OP_FX65();
+
+    // Array to pointers of functions
+    // https://austinmorlan.com/posts/chip8_emulator/#function-pointer-table
+    // To familiarize myself with arrays of pointers to functions instead of using a big switch statement
+    void Table0();
+    void Table8();
+    void TableE();
+    void TableF();
+
+    typedef void (Chip8::*Chip8Func)();
+    Chip8Func table[0xF + 1]{};
+    Chip8Func table0[0xE + 1]{};
+    Chip8Func table8[0xE + 1]{};
+    Chip8Func tableE[0xE + 1]{};
+    Chip8Func tableF[0x65 + 1]{};
+
 
 };
 
